@@ -1,0 +1,8 @@
+useDynLib(HiGarrote, .registration=TRUE)
+importFrom(Rcpp, evalCpp)
+import(RcppArmadillo)
+import(nloptr)
+import(quadprog)
+importFrom("stats", "contrasts<-", "dist", "model.matrix", "poly", "var", "lm", "contr.helmert", "contr.poly", "contrasts")
+export(HiGarrote)
+export(nnGarrote)
