@@ -208,7 +208,12 @@ HiGarrote <- function(D, y, quali_id = NULL, quanti_id = NULL,
     A1 <- gweak(U)
   }
   
-  beta_nng <- beta_nng_cpp_R(U, R, lambda, replicate, n, y, A1, s2)
+  beta_ele <- beta_ele_cpp_R(U, R, lambda, replicate, n, y)
+  if(!is_PD(beta_ele$Dmat)) {
+    D_nng <- Matrix::nearPD(beta_ele$Dmat)
+    beta_ele$Dmat <- as.matrix(D_nng$mat)
+  }
+  beta_nng <- beta_nng_cpp_R(beta_ele, replicate, n, y, A1, s2)
   beta_shrink = round(beta_nng, 3)
   names(beta_shrink) <- effects_name
   beta_shrink <- beta_shrink[which(beta_shrink!=0)]

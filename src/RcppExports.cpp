@@ -169,6 +169,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// is_PD
+bool is_PD(const arma::mat& M);
+RcppExport SEXP _HiGarrote_is_PD(SEXP MSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type M(MSEXP);
+    rcpp_result_gen = Rcpp::wrap(is_PD(M));
+    return rcpp_result_gen;
+END_RCPP
+}
 // initialize_BETA_instance
 void initialize_BETA_instance(Rcpp::List h_j_list, int p, Rcpp::List rho_list, Rcpp::IntegerVector mi);
 RcppExport SEXP _HiGarrote_initialize_BETA_instance(SEXP h_j_listSEXP, SEXP pSEXP, SEXP rho_listSEXP, SEXP miSEXP) {
@@ -194,21 +205,35 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// beta_nng_cpp_R
-Rcpp::NumericVector beta_nng_cpp_R(Rcpp::NumericMatrix U, Rcpp::NumericVector R, double lambda, int replicate, int n, Rcpp::NumericVector y, Rcpp::NumericMatrix Amat, double s2);
-RcppExport SEXP _HiGarrote_beta_nng_cpp_R(SEXP USEXP, SEXP RSEXP, SEXP lambdaSEXP, SEXP replicateSEXP, SEXP nSEXP, SEXP ySEXP, SEXP AmatSEXP, SEXP s2SEXP) {
+// beta_ele_cpp_R
+Rcpp::List beta_ele_cpp_R(const Rcpp::NumericMatrix& U, const Rcpp::NumericVector& R, double lambda, int replicate, int n, const Rcpp::NumericVector& y);
+RcppExport SEXP _HiGarrote_beta_ele_cpp_R(SEXP USEXP, SEXP RSEXP, SEXP lambdaSEXP, SEXP replicateSEXP, SEXP nSEXP, SEXP ySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type U(USEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type R(RSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type U(USEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type R(RSEXP);
     Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
     Rcpp::traits::input_parameter< int >::type replicate(replicateSEXP);
     Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type y(ySEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type Amat(AmatSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type y(ySEXP);
+    rcpp_result_gen = Rcpp::wrap(beta_ele_cpp_R(U, R, lambda, replicate, n, y));
+    return rcpp_result_gen;
+END_RCPP
+}
+// beta_nng_cpp_R
+Rcpp::NumericVector beta_nng_cpp_R(const Rcpp::List& beta_ele, int replicate, int n, const Rcpp::NumericVector& y, const Rcpp::NumericMatrix& Amat, double s2);
+RcppExport SEXP _HiGarrote_beta_nng_cpp_R(SEXP beta_eleSEXP, SEXP replicateSEXP, SEXP nSEXP, SEXP ySEXP, SEXP AmatSEXP, SEXP s2SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::List& >::type beta_ele(beta_eleSEXP);
+    Rcpp::traits::input_parameter< int >::type replicate(replicateSEXP);
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type Amat(AmatSEXP);
     Rcpp::traits::input_parameter< double >::type s2(s2SEXP);
-    rcpp_result_gen = Rcpp::wrap(beta_nng_cpp_R(U, R, lambda, replicate, n, y, Amat, s2));
+    rcpp_result_gen = Rcpp::wrap(beta_nng_cpp_R(beta_ele, replicate, n, y, Amat, s2));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -225,9 +250,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"_HiGarrote_nllh_GP_R", (DL_FUNC) &_HiGarrote_nllh_GP_R, 1},
     {"_HiGarrote_rho_lambda_optim", (DL_FUNC) &_HiGarrote_rho_lambda_optim, 10},
     {"_HiGarrote_rho_optim_GP", (DL_FUNC) &_HiGarrote_rho_optim_GP, 8},
+    {"_HiGarrote_is_PD", (DL_FUNC) &_HiGarrote_is_PD, 1},
     {"_HiGarrote_initialize_BETA_instance", (DL_FUNC) &_HiGarrote_initialize_BETA_instance, 4},
     {"_HiGarrote_r_j_cpp_R", (DL_FUNC) &_HiGarrote_r_j_cpp_R, 2},
-    {"_HiGarrote_beta_nng_cpp_R", (DL_FUNC) &_HiGarrote_beta_nng_cpp_R, 8},
+    {"_HiGarrote_beta_ele_cpp_R", (DL_FUNC) &_HiGarrote_beta_ele_cpp_R, 6},
+    {"_HiGarrote_beta_nng_cpp_R", (DL_FUNC) &_HiGarrote_beta_nng_cpp_R, 6},
     {NULL, NULL, 0}
 };
 

@@ -566,22 +566,23 @@ double tau0_sigma0_cpp(const std::vector<arma::mat> Psi_j_list, int p, Rcpp::Int
 } 
 
 // is_PD
+// [[Rcpp::export]]
 bool is_PD(const arma::mat& M) {
   // Attempt Cholesky decomposition
   arma::mat L;
   return arma::chol(L, M);  // Returns false if not positive definite
 }
 
-// make_PD
-arma::mat make_PD(const arma::mat& M) {
-  arma::vec eigval;
-  arma::mat eigvec;
-  arma::eig_sym(eigval, eigvec, M);
-
-  eigval.elem(arma::find(eigval < 1e-6)).fill(1e-6);
-  arma::mat M_pd = eigvec * arma::diagmat(eigval) * eigvec.t();
-  return M_pd;
-}
+// // make_PD
+// arma::mat make_PD(const arma::mat& M) {
+//   arma::vec eigval;
+//   arma::mat eigvec;
+//   arma::eig_sym(eigval, eigvec, M);
+// 
+//   eigval.elem(arma::find(eigval < 1e-6)).fill(1e-6);
+//   arma::mat M_pd = eigvec * arma::diagmat(eigval) * eigvec.t();
+//   return M_pd;
+// }
 
 
 //////////////////////////////// BETA
@@ -619,11 +620,10 @@ public:
     return result;
   } 
   
-  //////////////////////////////// beta_nng_cpp
-  Rcpp::NumericVector beta_nng_cpp(const Rcpp::NumericMatrix& U, const Rcpp::NumericVector& R,
-                                   double lambda, int replicate, int n,
-                                   const Rcpp::NumericVector& y, const Rcpp::NumericMatrix& Amat,
-                                   double s2) {
+  //////////////////////////////// beta_ele_cpp
+  Rcpp::List beta_ele_cpp(const Rcpp::NumericMatrix& U, const Rcpp::NumericVector& R,
+                          double lambda, int replicate, int n,
+                          const Rcpp::NumericVector& y) {
     arma::mat U_arma = Rcpp::as<arma::mat>(U);
     arma::vec R_arma = Rcpp::as<arma::vec>(R);
     arma::vec y_arma = Rcpp::as<arma::vec>(y);
@@ -646,17 +646,37 @@ public:
     // beta_nng
     arma::mat Z = U_arma.each_row() % beta_arma.t();
     arma::mat D_nng = Z.t() * Z;
-    if(!is_PD(D_nng)) {
-      D_nng = make_PD(D_nng);
-    }
-    Rcpp::NumericMatrix D_nng_R = Rcpp::wrap(D_nng);
+    
     arma::vec d = Z.t() * y_arma;
     Rcpp::NumericVector d_R = Rcpp::wrap(d);
+    
+    return Rcpp::List::create(Rcpp::Named("Dmat") = D_nng,
+                              Rcpp::Named("dvec") = d,
+                              Rcpp::Named("Z") = Z,
+                              Rcpp::Named("U") = U,
+                              Rcpp::Named("U_R_U0") = U_R_U0,
+                              Rcpp::Named("R_beta") = R_beta,
+                              Rcpp::Named("beta") = beta_arma);
+  } 
+  
+  
+  //////////////////////////////// beta_nng_cpp
+  Rcpp::NumericVector beta_nng_cpp(const Rcpp::List& beta_ele, int replicate, int n,
+                                   const Rcpp::NumericVector& y, const Rcpp::NumericMatrix& Amat,
+                                   double s2) {
+    Rcpp::NumericMatrix D_nng_R = beta_ele[0];
+    Rcpp::NumericVector d_R = beta_ele[1];
+    arma::mat Z = Rcpp::as<arma::mat>(beta_ele[2]);
+    arma::mat U_arma = Rcpp::as<arma::mat>(beta_ele[3]);
+    arma::mat U_R_U0 = Rcpp::as<arma::mat>(beta_ele[4]);
+    arma::mat R_beta = Rcpp::as<arma::mat>(beta_ele[5]);
+    arma::mat beta_arma = Rcpp::as<arma::mat>(beta_ele[6]);
+    arma::vec y_arma = Rcpp::as<arma::vec>(y);
     
     // GCV
     Rcpp::Environment quadprogEnv = Rcpp::Environment::namespace_env("quadprog");
     Rcpp::Function solve_QP = quadprogEnv["solve.QP"];
-    
+
     arma::vec best_coef_nng;
     arma::vec beta_nng_arma;
 
@@ -688,16 +708,18 @@ public:
       int best_idx = arma::index_min(cv);
       best_coef_nng = Rcpp::as<arma::vec>(coef_nng_list[best_idx]);
 
+
     } else {
       double nng_lambda = s2;
+      arma::vec d = Rcpp::as<arma::vec>(d_R);
       d -= nng_lambda;
-      Rcpp::NumericVector d_R = Rcpp::wrap(d);
+      Rcpp::NumericVector d_R2 = Rcpp::wrap(d);
       arma::mat Amat_arma = Rcpp::as<arma::mat>(Amat);
       Amat_arma.shed_col(0);
       Rcpp::NumericMatrix Amat_R = Rcpp::wrap(Amat_arma);
       Rcpp::NumericVector b0 = Rcpp::rep(0.0, Amat_R.ncol());
       Rcpp::List result = solve_QP(Rcpp::Named("Dmat") = D_nng_R,
-                                   Rcpp::Named("dvec") = d_R,
+                                   Rcpp::Named("dvec") = d_R2,
                                    Rcpp::Named("Amat") = Amat_R,
                                    Rcpp::Named("bvec") = b0);
       Rcpp::NumericVector coef_nng_R = result["solution"];
@@ -741,16 +763,26 @@ Rcpp::List r_j_cpp_R(Rcpp::List U_j_list, Rcpp::IntegerVector me_num) {
   return BETA_instance_ptr->get()->r_j_cpp(U_j_list, me_num);
 }
 
+// Export beta_ele_cpp
+// [[Rcpp::export]]
+Rcpp::List beta_ele_cpp_R(const Rcpp::NumericMatrix& U, const Rcpp::NumericVector& R,
+                          double lambda, int replicate, int n,
+                          const Rcpp::NumericVector& y) {
+  if (BETA_instance_ptr == nullptr) {
+    Rcpp::stop("BETA instance is not initialized. Call initialize_BETA_instance first.");
+  }
+  return BETA_instance_ptr->get()->beta_ele_cpp(U, R, lambda, replicate, n, y);
+}
+
 // Export beta_cpp
 // [[Rcpp::export]]
-Rcpp::NumericVector beta_nng_cpp_R(Rcpp::NumericMatrix U, Rcpp::NumericVector R,
-                                   double lambda, int replicate, int n,
-                                   Rcpp::NumericVector y, Rcpp::NumericMatrix Amat,
+Rcpp::NumericVector beta_nng_cpp_R(const Rcpp::List& beta_ele, int replicate, int n,
+                                   const Rcpp::NumericVector& y, const Rcpp::NumericMatrix& Amat,
                                    double s2) {
   if (BETA_instance_ptr == nullptr) {
     Rcpp::stop("BETA instance is not initialized. Call initialize_BETA_instance first.");
   }
-  return BETA_instance_ptr->get()->beta_nng_cpp(U, R, lambda, replicate, n, y, Amat, s2);
+  return BETA_instance_ptr->get()->beta_nng_cpp(beta_ele, replicate, n, y, Amat, s2);
 }
 
 
