@@ -2,7 +2,7 @@ Package: HiGarrote
 Type: Package
 Title: Nonnegative Garrote Method Incorporating Hierarchical
         Relationships
-Version: 1.0.1
+Version: 1.0.2
 Date: 2025-01-29
 Author: Wei-Yang Yu [aut, cre],
   V. Roshan Joseph [aut]
@@ -16,14 +16,14 @@ Authors@R: c(person(given = "Wei-Yang",
                       role = "aut"))
 Description: An implementation of the nonnegative garrote method that incorporates hierarchical relationships among variables. The core function, HiGarrote(), offers an automated approach for analyzing experiments while respecting hierarchical structures among effects. For methodological details, refer to Yu and Joseph (2024) <doi:10.48550/arXiv.2411.01383>. This work is supported by U.S. National Science Foundation grant DMS-2310637.
 License: GPL (>= 2)
-Imports: Matrix, MaxPro, nloptr, purrr, quadprog, Rcpp (>= 1.0.12),
-        RcppArmadillo, rlist, scales, stringr
+Imports: Matrix, matrixcalc, MaxPro, nloptr, purrr, quadprog, Rcpp (>=
+        1.0.12), RcppArmadillo, rlist, scales, stringr
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.3.2
 Encoding: UTF-8
 Depends: R (>= 2.10)
 LazyData: true
 NeedsCompilation: yes
-Packaged: 2025-01-29 18:41:47 UTC; weiyang
+Packaged: 2025-01-29 19:16:47 UTC; weiyang
 Repository: CRAN
-Date/Publication: 2025-01-29 19:00:06 UTC
+Date/Publication: 2025-01-30 23:30:02 UTC

@@ -209,7 +209,7 @@ HiGarrote <- function(D, y, quali_id = NULL, quanti_id = NULL,
   }
   
   beta_ele <- beta_ele_cpp_R(U, R, lambda, replicate, n, y)
-  if(!is_PD(beta_ele$Dmat)) {
+  if(!matrixcalc::is.positive.definite(beta_ele$Dmat)) {
     D_nng <- Matrix::nearPD(beta_ele$Dmat)
     beta_ele$Dmat <- as.matrix(D_nng$mat)
   }

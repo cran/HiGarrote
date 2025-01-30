@@ -45,10 +45,6 @@ rho_optim_GP <- function(ini_point, h_list_mat, n, replicate, y, nugget = 1e-6, 
     .Call(`_HiGarrote_rho_optim_GP`, ini_point, h_list_mat, n, replicate, y, nugget, epsilon, interpolate)
 }
 
-is_PD <- function(M) {
-    .Call(`_HiGarrote_is_PD`, M)
-}
-
 initialize_BETA_instance <- function(h_j_list, p, rho_list, mi) {
     invisible(.Call(`_HiGarrote_initialize_BETA_instance`, h_j_list, p, rho_list, mi))
 }

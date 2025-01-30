@@ -565,13 +565,13 @@ double tau0_sigma0_cpp(const std::vector<arma::mat> Psi_j_list, int p, Rcpp::Int
   return result;
 } 
 
-// is_PD
-// [[Rcpp::export]]
-bool is_PD(const arma::mat& M) {
-  // Attempt Cholesky decomposition
-  arma::mat L;
-  return arma::chol(L, M);  // Returns false if not positive definite
-}
+// // is_PD
+// // [[Rcpp::export]]
+// bool is_PD(const arma::mat& M) {
+//   // Attempt Cholesky decomposition
+//   arma::mat L;
+//   return arma::chol(L, M);  // Returns false if not positive definite
+// }
 
 // // make_PD
 // arma::mat make_PD(const arma::mat& M) {

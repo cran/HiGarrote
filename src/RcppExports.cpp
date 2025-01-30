@@ -169,17 +169,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// is_PD
-bool is_PD(const arma::mat& M);
-RcppExport SEXP _HiGarrote_is_PD(SEXP MSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::mat& >::type M(MSEXP);
-    rcpp_result_gen = Rcpp::wrap(is_PD(M));
-    return rcpp_result_gen;
-END_RCPP
-}
 // initialize_BETA_instance
 void initialize_BETA_instance(Rcpp::List h_j_list, int p, Rcpp::List rho_list, Rcpp::IntegerVector mi);
 RcppExport SEXP _HiGarrote_initialize_BETA_instance(SEXP h_j_listSEXP, SEXP pSEXP, SEXP rho_listSEXP, SEXP miSEXP) {
@@ -250,7 +239,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_HiGarrote_nllh_GP_R", (DL_FUNC) &_HiGarrote_nllh_GP_R, 1},
     {"_HiGarrote_rho_lambda_optim", (DL_FUNC) &_HiGarrote_rho_lambda_optim, 10},
     {"_HiGarrote_rho_optim_GP", (DL_FUNC) &_HiGarrote_rho_optim_GP, 8},
-    {"_HiGarrote_is_PD", (DL_FUNC) &_HiGarrote_is_PD, 1},
     {"_HiGarrote_initialize_BETA_instance", (DL_FUNC) &_HiGarrote_initialize_BETA_instance, 4},
     {"_HiGarrote_r_j_cpp_R", (DL_FUNC) &_HiGarrote_r_j_cpp_R, 2},
     {"_HiGarrote_beta_ele_cpp_R", (DL_FUNC) &_HiGarrote_beta_ele_cpp_R, 6},

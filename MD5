@@ -1,8 +1,8 @@
-1f1b9b4d4e3a28b68194074fbb6f990f *DESCRIPTION
+408561fdb4da001f8dce951f243ec480 *DESCRIPTION
 1044e1f81df7f5cf8e51de38ddfa5705 *NAMESPACE
-79c8d3f7e242832f827c7f3dbd44c4bf *NEWS.md
-8911fa1007176657fee6b505b700831d *R/HiGarrote.R
-8fba7a5ab6777f7b0ce466707f26c446 *R/RcppExports.R
+2641fa2ff5657d340e5301f670c12d65 *NEWS.md
+61da4c336f490a181b46779584878b54 *R/HiGarrote.R
+ddee25db2e83260af9880cb2977627c1 *R/RcppExports.R
 89126ca62dd0dfe216a7a960d3513430 *R/blood_glucose.R
 2afe516b7d02ddfc410bf075e85c1f8c *R/cast_fatigue.R
 455195726cd5ccedffcf442949413f1c *R/lib.R
@@ -16,5 +16,5 @@ f5411555548c71b6a3318132951ae9d3 *man/cast_fatigue.Rd
 781b1d0fc0d34273a2214338e1a9621f *man/nnGarrote.Rd
 be2ecdfdbc679eb57fa55cc03e30c22b *man/router_bit.Rd
 2a6f9e9e044a78154d3cfda5936d6f48 *src/Makevars
-44a7d2856a3a0c8c577c4a2310dc18cb *src/RcppExports.cpp
-1cffd748e161998859213db4c674b72a *src/lib.cpp
+a0e769dc6583f1044a3c10612e98c0e8 *src/RcppExports.cpp
+84b1b444819554ebe017ace8f1bde513 *src/lib.cpp
