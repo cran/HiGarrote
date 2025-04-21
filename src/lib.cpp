@@ -1,123 +1,6 @@
 // [[Rcpp::plugins("cpp11")]]
 #include <RcppArmadillo.h>
 
-//////////////////////////////// get_level
-// [[Rcpp::export]]
-Rcpp::List get_level(Rcpp::DataFrame D, int p) {
-  Rcpp::List uni_list(p);
-  for (int i = 0; i < p; ++i) {
-    Rcpp::NumericVector v = D[i];
-    Rcpp::NumericVector uni_v = Rcpp::unique(v);
-    std::sort(uni_v.begin(), uni_v.end());
-    uni_list[i] = uni_v;
-  }
-  return uni_list;
-}
-
-
-//////////////////////////////// contr_scale
-// [[Rcpp::export]]
-Rcpp::NumericMatrix contr_scale(Rcpp::NumericMatrix x, int level_num) {
-  arma::mat x_arma(x.begin(), x.nrow(), x.ncol(), false);
-  arma::mat x2 = x_arma.t() * x_arma;
-  arma::vec x3 = x2.diag()/level_num;
-  arma::vec x4 = 1.0 / arma::sqrt(x3);
-  arma::mat x5 = x_arma * (arma::diagmat(x4));
-  Rcpp::NumericMatrix x6 = Rcpp::wrap(x5);
-  return x6;
-}
-
-
-//////////////////////////////// U_j_cpp
-// [[Rcpp::export]]
-Rcpp::List U_j_cpp(Rcpp::List uni_level, int p, Rcpp::IntegerVector mi,
-                   SEXP quali_id, SEXP quanti_eq_id, SEXP quanti_ineq_id,
-                   SEXP quali_contr) {
-  
-  Rcpp::List U_j_list(p);
-  
-  Rcpp::Environment statsEnv = Rcpp::Environment::namespace_env("stats");
-  Rcpp::Function poly = statsEnv["poly"];
-  Rcpp::Function contrasts = statsEnv["contrasts"];
-  Rcpp::Function contr_helmert = statsEnv["contr.helmert"];
-  Rcpp::Function contr_poly = statsEnv["contr.poly"];
-  
-  Rcpp::IntegerVector quali_id_cpp;
-  Rcpp::IntegerVector quanti_eq_id_cpp;
-  Rcpp::IntegerVector quanti_ineq_id_cpp;
-  Rcpp::List quali_contr_cpp;
-  
-  if(!Rf_isNull(quali_id)) {
-    quali_id_cpp = Rcpp::clone(Rcpp::as<Rcpp::IntegerVector>(quali_id));
-    quali_id_cpp = quali_id_cpp - 1;
-  } 
-  if(!Rf_isNull(quanti_eq_id)) {
-    quanti_eq_id_cpp = Rcpp::clone(Rcpp::as<Rcpp::IntegerVector>(quanti_eq_id));
-    quanti_eq_id_cpp = quanti_eq_id_cpp - 1;
-  }  
-  if(!Rf_isNull(quanti_ineq_id)) {
-    quanti_ineq_id_cpp = Rcpp::clone(Rcpp::as<Rcpp::IntegerVector>(quanti_ineq_id));
-    quanti_ineq_id_cpp = quanti_ineq_id_cpp - 1;
-  }
-  if(!Rf_isNull(quali_contr)) {
-    quali_contr_cpp = Rcpp::clone(Rcpp::as<Rcpp::List>(quali_contr));
-  }
-  
-  for (int j = 0; j < p; ++j) {
-    Rcpp::NumericVector x = uni_level[j];
-    Rcpp::NumericMatrix x2;
-    
-    if (std::find(quali_id_cpp.begin(), quali_id_cpp.end(), j) != quali_id_cpp.end()) {
-      Rcpp::NumericMatrix x1;
-      if(!Rf_isNull(quali_contr_cpp[j])) {
-        x1 = Rcpp::as<Rcpp::NumericMatrix>(quali_contr_cpp[j]);
-      } else {
-        x1 = contr_helmert(x);
-      }
-      x2 = contr_scale(x1, mi[j]);
-      arma::mat x_arma(x2.begin(), x2.nrow(), x2.ncol(), false);
-      int n_rows = x_arma.n_rows;
-      arma::vec ones_column = arma::ones<arma::vec>(n_rows);
-      arma::mat new_matrix = arma::join_horiz(ones_column, x_arma);
-      x2 = Rcpp::wrap(new_matrix);
-      
-    } else if (std::find(quanti_eq_id_cpp.begin(), quanti_eq_id_cpp.end(), j) != quanti_eq_id_cpp.end()) {
-      Rcpp::NumericMatrix x1 = contr_poly(x);
-      x2 = contr_scale(x1, mi[j]);
-      arma::mat x_arma(x2.begin(), x2.nrow(), x2.ncol(), false);
-      int n_rows = x_arma.n_rows;
-      arma::vec ones_column = arma::ones<arma::vec>(n_rows);
-      arma::mat new_matrix = arma::join_horiz(ones_column, x_arma);
-      x2 = Rcpp::wrap(new_matrix);
-      
-    } else if (std::find(quanti_ineq_id_cpp.begin(), quanti_ineq_id_cpp.end(), j) != quanti_ineq_id_cpp.end()) {
-      Rcpp::NumericMatrix x1 = poly(x, mi[j] - 1);
-      x2 = contr_scale(x1, mi[j]);
-      arma::mat x_arma(x2.begin(), x2.nrow(), x2.ncol(), false);
-      int n_rows = x_arma.n_rows;
-      arma::vec ones_column = arma::ones<arma::vec>(n_rows);
-      arma::mat new_matrix = arma::join_horiz(ones_column, x_arma);
-      x2 = Rcpp::wrap(new_matrix);
-      
-    } else {
-      arma::mat x1(2,2);
-      x1(0,0) = 1;
-      x1(1,0) = 1;
-      x1(0,1) = -1;
-      x1(1,1) = 1;
-      x2 = Rcpp::wrap(x1);
-    }
-    
-    
-    U_j_list[j] = x2;
-    
-    // Rcpp::CharacterMatrix m_char = Rcpp::as<Rcpp::CharacterMatrix>(m);
-    // U_j_list[j] = m_char;
-  }
-  return U_j_list;
-}
-
-
 //////////////////////////////// arma_dist
 arma::mat arma_dist(const arma::vec& x) {
   int n = x.n_elem;
@@ -217,9 +100,8 @@ arma::mat Psi_mat_cpp(const std::vector<arma::mat>& h_list_mat, const Rcpp::Nume
 //////////////////////////////// NLLH
 class NLLH {
 public:
-  NLLH(const Rcpp::List& h_list_mat_, int n_, int replicate_, const Rcpp::NumericVector& y_,
-       double nugget_ = 1e-6, double epsilon_ = 1e-3, bool interpolate_ = true)
-    : n(n_), replicate(replicate_), y(y_), nugget(nugget_), epsilon(epsilon_), interpolate(interpolate_){
+  NLLH(const Rcpp::List& h_list_mat_, int n_, int replicate_, const Rcpp::NumericVector& y_)
+    : n(n_), replicate(replicate_), y(y_){
     
     for(int i = 0; i < h_list_mat_.size(); ++i) {
       arma::mat mat = Rcpp::as<arma::mat>(h_list_mat_[i]);
@@ -305,117 +187,12 @@ public:
     return Rcpp::List::create(Rcpp::Named("objective") = obj, Rcpp::Named("gradient") = gradient);
   }
   
-  // //////////////////////////////// small_GP_cpp
-  // Rcpp::List small_GP_cpp(const Rcpp::NumericVector& rho_lambda) {
-  //   Rcpp::NumericVector rho = rho_lambda[Rcpp::Range(0, rho_lambda.size()-2)];
-  //   double lambda = rho_lambda[rho_lambda.size() - 1];
-  //   
-  //   arma::mat Psi_mat = Psi_mat_cpp(h_list_mat, rho);
-  //   arma::mat R_beta0 = Psi_mat + (lambda/(1-lambda))*(arma::eye(n,n));
-  //   arma::mat R_beta = Psi_mat + (lambda/(1-lambda))*(arma::eye(n,n)/replicate);
-  //   
-  //   // Eigen decomposition
-  //   arma::vec eigval;
-  //   arma::mat eigvec;
-  //   arma::eig_sym(eigval, eigvec, R_beta);
-  //   
-  //   // Cholesky decomposition
-  //   arma::vec a = eigvec.t() * arma::ones(n);
-  //   arma::vec b = eigvec.t() * y;
-  //   double mu = arma::sum(a%b / eigval) / arma::sum(arma::square(a) / eigval);
-  //   double nu2 = (1.0/n) * (arma::sum(arma::square(b) / eigval) - mu*mu*arma::sum(arma::square(a) / eigval));
-  //   nu2 = std::max(nu2, 1e-15);
-  //   
-  //   return Rcpp::List::create(Rcpp::Named("mu") = mu, Rcpp::Named("nu2") = nu2,
-  //                             Rcpp::Named("a") = a, Rcpp::Named("b") = b, 
-  //                             Rcpp::Named("eigval") = eigval, Rcpp::Named("eigvec") = eigvec,
-  //                             Rcpp::Named("Psi_mat") = Psi_mat, Rcpp::Named("R_beta") = R_beta);
-  // }
-  
-  //////////////////////////////// nllh_GP_cpp
-  Rcpp::List nllh_GP_cpp(const Rcpp::NumericVector& rho) {
-    int rho_size = rho.size();
-    
-    // Ensure valid rho values using Rcpp::all() and Rcpp::is_finite()
-    if (!Rcpp::all(Rcpp::is_finite(rho)).is_true() ) {
-      // Return Inf for invalid objective and gradient to signal a bad point in optimization
-      return Rcpp::List::create(Rcpp::Named("objective") = R_PosInf, Rcpp::Named("gradient") = Rcpp::NumericVector(rho_size, R_PosInf));
-    }
-    
-    arma::mat Psi_mat = Psi_mat_cpp(h_list_mat, rho);
-    arma::mat R_beta = Psi_mat + nugget*(arma::eye(n,n)/replicate);
-    
-    // Eigen decomposition
-    arma::vec eigval;
-    arma::mat eigvec;
-    arma::eig_sym(eigval, eigvec, R_beta);
-    
-    // Cholesky decomposition
-    arma::vec a = eigvec.t() * arma::ones(n);
-    arma::vec b = eigvec.t() * y;
-    arma::mat L = arma::chol(R_beta, "lower");
-    arma::vec a0 = arma::solve(arma::trimatl(L), arma::ones(n), arma::solve_opts::fast);
-    arma::vec b0 = arma::solve(arma::trimatl(L), y, arma::solve_opts::fast);
-    // arma::mat L = eigvec * arma::diagmat(arma::sqrt(eigval));
-    // arma::vec a0 = a * (1/arma::sqrt(eigval));
-    // arma::vec b0 = b * (1/arma::sqrt(eigval));
-    
-    double mu = arma::sum(a%b / eigval) / arma::sum(arma::square(a) / eigval);
-    double nu2 = (1.0/(n-1)) * (arma::sum(arma::square(b) / eigval) - mu*mu*arma::sum(arma::square(a) / eigval));
-    nu2 = std::max(nu2, 1e-15);
-    
-    // obj
-    // double obj = (n-1)*std::log(nu2) + arma::sum(arma::log(eigval)) + std::log(arma::sum(arma::square(a0)));
-    double gg1 = (n-1)*std::log(nu2);
-    double gg2 = arma::sum(arma::log(eigval));
-    double gg3 = std::log(arma::sum(arma::square(a0)));
-    double obj = gg1 + gg2 + gg3;
-    if (interpolate) {
-      // penalty for non-interpolating
-      arma::vec ym = b0 - mu * a0;
-      arma::vec L_t_solve_ym = arma::solve(arma::trimatu(L.t()), ym, arma::solve_opts::fast);
-      arma::vec pred = mu + (L*ym - L_t_solve_ym*nugget);
-      double y_tss = arma::sum(arma::square(y)) - std::pow(arma::sum(y), 2)/n;
-      double penalty = 2 * arma::sum(arma::square((y-pred))) / (epsilon * y_tss);
-      obj = obj / n + penalty;
-    }
-    
-    
-    // gradient
-    arma::mat R_beta_inv = eigvec * arma::diagmat(1/eigval) * eigvec.t();
-    
-    std::vector<arma::mat> R_beta_deriv(rho_size);
-    std::vector<arma::mat> h_list_mat_no_i;
-    Rcpp::NumericVector rho_no_i;
-    for(int i = 0; i < rho_size; ++i) {
-      arma::mat g1 = arma::square(h_list_mat[i]) % arma::exp(std::log(rho[i]) * (arma::square(h_list_mat[i])-1));
-      h_list_mat_no_i = exclude_i_mat(i);
-      rho_no_i = exclude_i_ele(rho, i);
-      arma::mat g2 = Psi_mat_cpp(h_list_mat_no_i, rho_no_i);
-      R_beta_deriv[i] = g1 % g2;
-    }
-    arma::vec gradient(rho_size);
-    for(int i = 0; i < R_beta_deriv.size(); ++i) {
-      double part1 = arma::as_scalar(y.t()*R_beta_inv*R_beta_deriv[i]*R_beta_inv*y) / arma::as_scalar(y.t()*R_beta_inv*y);
-      double part2 = arma::trace(R_beta_inv*R_beta_deriv[i])/n;
-      gradient(i) = -(part1 - part2);
-    }
-
-    return Rcpp::List::create(Rcpp::Named("objective") = obj, Rcpp::Named("gradient") = gradient,
-                              Rcpp::Named("mu") = mu, Rcpp::Named("nu2") = nu2,
-                              Rcpp::Named("a") = a, Rcpp::Named("b") = b,
-                              Rcpp::Named("eigval") = eigval, Rcpp::Named("eigvec") = eigvec);
-  } 
-  
   
 private:
   std::vector<arma::mat> h_list_mat;
   int n;
   int replicate;
   arma::vec y;
-  double nugget;
-  double epsilon;
-  bool interpolate;
 };
 
 //////////////////////////////// Export nllh_cpp
@@ -423,15 +200,12 @@ private:
 Rcpp::XPtr<NLLH>* NLLH_instance_ptr = nullptr;
 
 // Function to initialize the NLLH instance
-// [[Rcpp::export]]
-void initialize_NLLH_instance(Rcpp::List h_list_mat, int n, int replicate, Rcpp::NumericVector y,
-                              double nugget, double epsilon, bool interpolate) {
-  NLLH* ptr = new NLLH(h_list_mat, n, replicate, y, nugget, epsilon, interpolate);
+void initialize_NLLH_instance(Rcpp::List h_list_mat, int n, int replicate, Rcpp::NumericVector y) {
+  NLLH* ptr = new NLLH(h_list_mat, n, replicate, y);
   NLLH_instance_ptr = new Rcpp::XPtr<NLLH>(ptr, true);
-} 
+}
 
 // Function to calculate the negative log-likelihood
-// [[Rcpp::export]]
 Rcpp::List nllh_cpp_R(Rcpp::NumericVector rho_lambda) {
   if (NLLH_instance_ptr == nullptr) {
     Rcpp::stop("NLLH instance is not initialized. Call initialize_NLLH_instance first.");
@@ -439,23 +213,14 @@ Rcpp::List nllh_cpp_R(Rcpp::NumericVector rho_lambda) {
   return NLLH_instance_ptr->get()->nllh_cpp(rho_lambda);
 }
 
-// Function to get information required in GP
-// [[Rcpp::export]]
-Rcpp::List nllh_GP_R(Rcpp::NumericVector rho) {
-  if (NLLH_instance_ptr == nullptr) {
-    Rcpp::stop("NLLH instance is not initialized. Call initialize_NLLH_instance first.");
-  }
-  return NLLH_instance_ptr->get()->nllh_GP_cpp(rho);
-}
 
 
 //////////////////////////////// rho_lambda_optim
 // [[Rcpp::export]]
 Rcpp::List rho_lambda_optim(const Rcpp::NumericMatrix& ini_point, const Rcpp::List& h_list_mat,
                             int n, int replicate, Rcpp::NumericVector y,
-                            double lambda_lb, double lambda_ub, 
-                            double nugget = 1e-6, double epsilon = 1e-3, bool interpolate = true) {
-  initialize_NLLH_instance(h_list_mat, n, replicate, y, nugget, epsilon, interpolate);
+                            double lambda_lb, double lambda_ub) {
+  initialize_NLLH_instance(h_list_mat, n, replicate, y);
   int num_point = ini_point.nrow();
   int num_param = ini_point.ncol();
   Rcpp::List result(num_point);
@@ -486,43 +251,6 @@ Rcpp::List rho_lambda_optim(const Rcpp::NumericMatrix& ini_point, const Rcpp::Li
   return result;
 }
 
-
-//////////////////////////////// rho_optim_GP
-// [[Rcpp::export]]
-Rcpp::List rho_optim_GP(const Rcpp::NumericMatrix& ini_point, const Rcpp::List& h_list_mat,
-                        int n, int replicate, Rcpp::NumericVector y,
-                        double nugget = 1e-6, double epsilon = 1e-3, bool interpolate = true) {
-  initialize_NLLH_instance(h_list_mat, n, replicate, y, nugget, epsilon, interpolate);
-  
-  int num_point = ini_point.nrow();
-  int num_param = ini_point.ncol();
-  Rcpp::List result(num_point);
-
-  Rcpp::Environment nloptrEnv = Rcpp::Environment::namespace_env("nloptr");
-  Rcpp::Function nloptr = nloptrEnv["nloptr"];
-
-  // Set up
-  Rcpp::List opts = Rcpp::List::create(
-    Rcpp::Named("algorithm") = "NLOPT_LD_MMA",
-    Rcpp::Named("xtol_rel") = 1.0e-8,
-    Rcpp::Named("maxeval") = 100
-  );
-  arma::vec lb = arma::vec(num_param).fill(1e-15);
-  arma::vec ub = arma::vec(num_param).fill(0.999);
-  
-  Rcpp::NumericVector ini_point_i;
-  for(int i = 0; i < num_point; ++i) {
-    ini_point_i = ini_point(i,Rcpp::_);
-    Rcpp::List x = nloptr(Rcpp::_["x0"] = ini_point_i,
-                          Rcpp::_["eval_f"] = Rcpp::InternalFunction(&nllh_GP_R),
-                          Rcpp::_["lb"] = lb,
-                          Rcpp::_["ub"] = ub,
-                          Rcpp::_["opts"] = opts);
-    result[i] = Rcpp::List::create(x);
-  } 
-  
-  return result;
-} 
 
 
 //////////////////////////////// Psi_j_list_cpp
@@ -564,25 +292,6 @@ double tau0_sigma0_cpp(const std::vector<arma::mat> Psi_j_list, int p, Rcpp::Int
   
   return result;
 } 
-
-// // is_PD
-// // [[Rcpp::export]]
-// bool is_PD(const arma::mat& M) {
-//   // Attempt Cholesky decomposition
-//   arma::mat L;
-//   return arma::chol(L, M);  // Returns false if not positive definite
-// }
-
-// // make_PD
-// arma::mat make_PD(const arma::mat& M) {
-//   arma::vec eigval;
-//   arma::mat eigvec;
-//   arma::eig_sym(eigval, eigvec, M);
-// 
-//   eigval.elem(arma::find(eigval < 1e-6)).fill(1e-6);
-//   arma::mat M_pd = eigvec * arma::diagmat(eigval) * eigvec.t();
-//   return M_pd;
-// }
 
 
 //////////////////////////////// BETA

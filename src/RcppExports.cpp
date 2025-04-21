@@ -11,47 +11,6 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// get_level
-Rcpp::List get_level(Rcpp::DataFrame D, int p);
-RcppExport SEXP _HiGarrote_get_level(SEXP DSEXP, SEXP pSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::DataFrame >::type D(DSEXP);
-    Rcpp::traits::input_parameter< int >::type p(pSEXP);
-    rcpp_result_gen = Rcpp::wrap(get_level(D, p));
-    return rcpp_result_gen;
-END_RCPP
-}
-// contr_scale
-Rcpp::NumericMatrix contr_scale(Rcpp::NumericMatrix x, int level_num);
-RcppExport SEXP _HiGarrote_contr_scale(SEXP xSEXP, SEXP level_numSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type x(xSEXP);
-    Rcpp::traits::input_parameter< int >::type level_num(level_numSEXP);
-    rcpp_result_gen = Rcpp::wrap(contr_scale(x, level_num));
-    return rcpp_result_gen;
-END_RCPP
-}
-// U_j_cpp
-Rcpp::List U_j_cpp(Rcpp::List uni_level, int p, Rcpp::IntegerVector mi, SEXP quali_id, SEXP quanti_eq_id, SEXP quanti_ineq_id, SEXP quali_contr);
-RcppExport SEXP _HiGarrote_U_j_cpp(SEXP uni_levelSEXP, SEXP pSEXP, SEXP miSEXP, SEXP quali_idSEXP, SEXP quanti_eq_idSEXP, SEXP quanti_ineq_idSEXP, SEXP quali_contrSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::List >::type uni_level(uni_levelSEXP);
-    Rcpp::traits::input_parameter< int >::type p(pSEXP);
-    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type mi(miSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type quali_id(quali_idSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type quanti_eq_id(quanti_eq_idSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type quanti_ineq_id(quanti_ineq_idSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type quali_contr(quali_contrSEXP);
-    rcpp_result_gen = Rcpp::wrap(U_j_cpp(uni_level, p, mi, quali_id, quanti_eq_id, quanti_ineq_id, quali_contr));
-    return rcpp_result_gen;
-END_RCPP
-}
 // h_dist_cpp
 Rcpp::List h_dist_cpp(Rcpp::NumericVector x, Rcpp::NumericMatrix m, bool two_level, bool quali);
 RcppExport SEXP _HiGarrote_h_dist_cpp(SEXP xSEXP, SEXP mSEXP, SEXP two_levelSEXP, SEXP qualiSEXP) {
@@ -93,47 +52,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// initialize_NLLH_instance
-void initialize_NLLH_instance(Rcpp::List h_list_mat, int n, int replicate, Rcpp::NumericVector y, double nugget, double epsilon, bool interpolate);
-RcppExport SEXP _HiGarrote_initialize_NLLH_instance(SEXP h_list_matSEXP, SEXP nSEXP, SEXP replicateSEXP, SEXP ySEXP, SEXP nuggetSEXP, SEXP epsilonSEXP, SEXP interpolateSEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::List >::type h_list_mat(h_list_matSEXP);
-    Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    Rcpp::traits::input_parameter< int >::type replicate(replicateSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type y(ySEXP);
-    Rcpp::traits::input_parameter< double >::type nugget(nuggetSEXP);
-    Rcpp::traits::input_parameter< double >::type epsilon(epsilonSEXP);
-    Rcpp::traits::input_parameter< bool >::type interpolate(interpolateSEXP);
-    initialize_NLLH_instance(h_list_mat, n, replicate, y, nugget, epsilon, interpolate);
-    return R_NilValue;
-END_RCPP
-}
-// nllh_cpp_R
-Rcpp::List nllh_cpp_R(Rcpp::NumericVector rho_lambda);
-RcppExport SEXP _HiGarrote_nllh_cpp_R(SEXP rho_lambdaSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type rho_lambda(rho_lambdaSEXP);
-    rcpp_result_gen = Rcpp::wrap(nllh_cpp_R(rho_lambda));
-    return rcpp_result_gen;
-END_RCPP
-}
-// nllh_GP_R
-Rcpp::List nllh_GP_R(Rcpp::NumericVector rho);
-RcppExport SEXP _HiGarrote_nllh_GP_R(SEXP rhoSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type rho(rhoSEXP);
-    rcpp_result_gen = Rcpp::wrap(nllh_GP_R(rho));
-    return rcpp_result_gen;
-END_RCPP
-}
 // rho_lambda_optim
-Rcpp::List rho_lambda_optim(const Rcpp::NumericMatrix& ini_point, const Rcpp::List& h_list_mat, int n, int replicate, Rcpp::NumericVector y, double lambda_lb, double lambda_ub, double nugget, double epsilon, bool interpolate);
-RcppExport SEXP _HiGarrote_rho_lambda_optim(SEXP ini_pointSEXP, SEXP h_list_matSEXP, SEXP nSEXP, SEXP replicateSEXP, SEXP ySEXP, SEXP lambda_lbSEXP, SEXP lambda_ubSEXP, SEXP nuggetSEXP, SEXP epsilonSEXP, SEXP interpolateSEXP) {
+Rcpp::List rho_lambda_optim(const Rcpp::NumericMatrix& ini_point, const Rcpp::List& h_list_mat, int n, int replicate, Rcpp::NumericVector y, double lambda_lb, double lambda_ub);
+RcppExport SEXP _HiGarrote_rho_lambda_optim(SEXP ini_pointSEXP, SEXP h_list_matSEXP, SEXP nSEXP, SEXP replicateSEXP, SEXP ySEXP, SEXP lambda_lbSEXP, SEXP lambda_ubSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -144,28 +65,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type y(ySEXP);
     Rcpp::traits::input_parameter< double >::type lambda_lb(lambda_lbSEXP);
     Rcpp::traits::input_parameter< double >::type lambda_ub(lambda_ubSEXP);
-    Rcpp::traits::input_parameter< double >::type nugget(nuggetSEXP);
-    Rcpp::traits::input_parameter< double >::type epsilon(epsilonSEXP);
-    Rcpp::traits::input_parameter< bool >::type interpolate(interpolateSEXP);
-    rcpp_result_gen = Rcpp::wrap(rho_lambda_optim(ini_point, h_list_mat, n, replicate, y, lambda_lb, lambda_ub, nugget, epsilon, interpolate));
-    return rcpp_result_gen;
-END_RCPP
-}
-// rho_optim_GP
-Rcpp::List rho_optim_GP(const Rcpp::NumericMatrix& ini_point, const Rcpp::List& h_list_mat, int n, int replicate, Rcpp::NumericVector y, double nugget, double epsilon, bool interpolate);
-RcppExport SEXP _HiGarrote_rho_optim_GP(SEXP ini_pointSEXP, SEXP h_list_matSEXP, SEXP nSEXP, SEXP replicateSEXP, SEXP ySEXP, SEXP nuggetSEXP, SEXP epsilonSEXP, SEXP interpolateSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type ini_point(ini_pointSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::List& >::type h_list_mat(h_list_matSEXP);
-    Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    Rcpp::traits::input_parameter< int >::type replicate(replicateSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type y(ySEXP);
-    Rcpp::traits::input_parameter< double >::type nugget(nuggetSEXP);
-    Rcpp::traits::input_parameter< double >::type epsilon(epsilonSEXP);
-    Rcpp::traits::input_parameter< bool >::type interpolate(interpolateSEXP);
-    rcpp_result_gen = Rcpp::wrap(rho_optim_GP(ini_point, h_list_mat, n, replicate, y, nugget, epsilon, interpolate));
+    rcpp_result_gen = Rcpp::wrap(rho_lambda_optim(ini_point, h_list_mat, n, replicate, y, lambda_lb, lambda_ub));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -228,17 +128,10 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_HiGarrote_get_level", (DL_FUNC) &_HiGarrote_get_level, 2},
-    {"_HiGarrote_contr_scale", (DL_FUNC) &_HiGarrote_contr_scale, 2},
-    {"_HiGarrote_U_j_cpp", (DL_FUNC) &_HiGarrote_U_j_cpp, 7},
     {"_HiGarrote_h_dist_cpp", (DL_FUNC) &_HiGarrote_h_dist_cpp, 4},
     {"_HiGarrote_h_j_cpp", (DL_FUNC) &_HiGarrote_h_j_cpp, 5},
     {"_HiGarrote_Psi_mat_cpp", (DL_FUNC) &_HiGarrote_Psi_mat_cpp, 2},
-    {"_HiGarrote_initialize_NLLH_instance", (DL_FUNC) &_HiGarrote_initialize_NLLH_instance, 7},
-    {"_HiGarrote_nllh_cpp_R", (DL_FUNC) &_HiGarrote_nllh_cpp_R, 1},
-    {"_HiGarrote_nllh_GP_R", (DL_FUNC) &_HiGarrote_nllh_GP_R, 1},
-    {"_HiGarrote_rho_lambda_optim", (DL_FUNC) &_HiGarrote_rho_lambda_optim, 10},
-    {"_HiGarrote_rho_optim_GP", (DL_FUNC) &_HiGarrote_rho_optim_GP, 8},
+    {"_HiGarrote_rho_lambda_optim", (DL_FUNC) &_HiGarrote_rho_lambda_optim, 7},
     {"_HiGarrote_initialize_BETA_instance", (DL_FUNC) &_HiGarrote_initialize_BETA_instance, 4},
     {"_HiGarrote_r_j_cpp_R", (DL_FUNC) &_HiGarrote_r_j_cpp_R, 2},
     {"_HiGarrote_beta_ele_cpp_R", (DL_FUNC) &_HiGarrote_beta_ele_cpp_R, 6},

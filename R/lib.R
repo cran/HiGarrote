@@ -1,4 +1,10 @@
 ############################################### Simple functions written in R
+## get levels for each factor
+#' @noRd
+get_level <- function(D, p) {
+  lapply(1:p, function(i) sort(unique(D[[i]])))
+}
+
 ## transfer all the columns of D into numeric vectors
 #' @noRd
 check_D <- function(D) {
@@ -7,6 +13,54 @@ check_D <- function(D) {
   colnames(D) <- D.colname
   D <- data.frame(unique(D))
   return(D)
+}
+
+## scale contrasts
+#' @noRd
+contr_scale <- function(x, level_num) {
+  scale_factors <- 1 / sqrt(colSums(x^2) / level_num)
+  x_scaled <- sweep(x, 2, scale_factors, FUN = "*")
+  
+  return(x_scaled)
+}
+
+## model matrix for each factor
+#' @noRd
+U_j_R <- function(uni_level, p, mi,
+                  quali_id = NULL, quanti_eq_id = NULL, quanti_ineq_id = NULL,
+                  quali_contr = NULL) {
+  U_j_list <- vector("list", p)
+  
+  for (j in 1:p) {
+    x <- uni_level[[j]]
+    
+    if (!is.null(quali_id) && j %in% quali_id) {
+      if (!is.null(quali_contr) && !is.null(quali_contr[[j]])) {
+        x1 <- quali_contr[[j]]
+      } else {
+        x1 <- contr.helmert(x)
+      }
+      x2 <- contr_scale(x1, mi[j])
+      x2 <- cbind(1, x2)
+      
+    } else if (!is.null(quanti_eq_id) && j %in% quanti_eq_id) {
+      x1 <- contr.poly(x)
+      x2 <- contr_scale(x1, mi[j])
+      x2 <- cbind(1, x2)
+      
+    } else if (!is.null(quanti_ineq_id) && j %in% quanti_ineq_id) {
+      x1 <- poly(x, degree = mi[j] - 1, raw = FALSE, simple = TRUE)
+      x2 <- contr_scale(x1, mi[j])
+      x2 <- cbind(1, x2)
+      
+    } else {
+      x2 <- matrix(c(1, 1, -1, 1), nrow = 2)
+    }
+    
+    U_j_list[[j]] <- x2
+  }
+  
+  return(U_j_list)
 }
 
 ## check if columns are equally spaced

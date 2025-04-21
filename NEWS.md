@@ -18,3 +18,10 @@
 
 * Remove the original is_PD function in function: nnGarrote and use matrixcalc::is.positive.definite instead.
 * Resolve the scaling issues happening in functions: HiGarrote and nnGarrote in HiGarrote.R. The new version ensures that variable selection is invariant to the response scaling.
+
+# HiGarrote 1.1.1
+
+## Changes in version 1.1.1 (submitted 2025-04-21)
+
+* Strip large functions in lib.cpp to save the size of compilation files.
+* Resolve the positive definite issues in functions: HiGarrote and nnGarrote when solving the quadratic programming problem.

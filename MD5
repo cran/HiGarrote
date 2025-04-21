@@ -1,11 +1,11 @@
-a3c5d4fbf05732207582fe5a7332a312 *DESCRIPTION
+e59171ade9a47d7ba9bfd1c68a1fae5f *DESCRIPTION
 aeb4bcd69f1050651df3583ce77bbb6d *NAMESPACE
-25ee459e72b203ab0105b15c54d110e1 *NEWS.md
-4e37d7b3f70c96ad24f7961334563609 *R/HiGarrote.R
-ddee25db2e83260af9880cb2977627c1 *R/RcppExports.R
+29866f7a66c459e71b9145f361cdff89 *NEWS.md
+d7972e397638040f1cb2c30e56d88218 *R/HiGarrote.R
+9a4f245998a3b93d54190b4baf8a9f11 *R/RcppExports.R
 89126ca62dd0dfe216a7a960d3513430 *R/blood_glucose.R
 2afe516b7d02ddfc410bf075e85c1f8c *R/cast_fatigue.R
-455195726cd5ccedffcf442949413f1c *R/lib.R
+8b9f26fd134172f5c2e9b58d8e965907 *R/lib.R
 0f3b3b95fa74985c79e6e5ca7fc552d5 *R/router_bit.R
 2f7f88de9470b0909d7908931eb46d1d *data/blood_glucose.rda
 6f4866ecdfcbc35a758e4340a5fe9e0e *data/cast_fatigue.rda
@@ -16,5 +16,5 @@ f5411555548c71b6a3318132951ae9d3 *man/cast_fatigue.Rd
 781b1d0fc0d34273a2214338e1a9621f *man/nnGarrote.Rd
 be2ecdfdbc679eb57fa55cc03e30c22b *man/router_bit.Rd
 2a6f9e9e044a78154d3cfda5936d6f48 *src/Makevars
-a0e769dc6583f1044a3c10612e98c0e8 *src/RcppExports.cpp
-84b1b444819554ebe017ace8f1bde513 *src/lib.cpp
+7261baacf6e1be2e0e8bff69cfab66dd *src/RcppExports.cpp
+5eaaa48cbe0e32f638d582449ed02b23 *src/lib.cpp

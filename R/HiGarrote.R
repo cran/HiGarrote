@@ -95,9 +95,7 @@ HiGarrote <- function(D, y, quali_id = NULL, quanti_id = NULL,
   if(replicate != 1) {
     y_s2 <- y_s2/y_sd
     s2 <- mean(sapply(split(y_s2,run),var))
-    # s2 <- s2/y_sd
   }
-  # y <- scale(y, scale = FALSE)
   
   # STEP 2: ERROR HANDLING
   if(n != length(y)) { stop("ERROR: Run size of D must equal to y")}
@@ -167,7 +165,7 @@ HiGarrote <- function(D, y, quali_id = NULL, quanti_id = NULL,
   h_list_mat <- rlist::list.flatten(h_list)
   
   # STEP 5: U_j_list, h_j_list
-  U_j_list <- U_j_cpp(uni_level, p, mi, quali_id, quanti_eq_id, quanti_ineq_id, quali_contr)
+  U_j_list <- U_j_R(uni_level, p, mi, quali_id, quanti_eq_id, quanti_ineq_id, quali_contr)
   h_j_list <- h_j_cpp(p, uni_level, U_j_list, two_level_id, quali_id)
   h_j_list <- unlist(h_j_list, recursive = FALSE)
   rho_len <- ifelse(sapply(h_j_list, is.list) == FALSE, 1, lengths(h_j_list))
@@ -214,6 +212,7 @@ HiGarrote <- function(D, y, quali_id = NULL, quanti_id = NULL,
   }
   
   beta_ele <- beta_ele_cpp_R(U, R, lambda, replicate, n, y)
+  beta_ele$Dmat <- (beta_ele$Dmat + t(beta_ele$Dmat))/2
   if(!matrixcalc::is.positive.definite(beta_ele$Dmat)) {
     D_nng <- Matrix::nearPD(beta_ele$Dmat)
     beta_ele$Dmat <- as.matrix(D_nng$mat)
@@ -308,6 +307,7 @@ nnGarrote <- function(U, y, new_U = NULL, heredity = "weak") {
   Z=U%*%B
   D.mat=t(Z)%*%Z
   d=t(Z)%*%y
+  D.mat <- (D.mat + t(D.mat))/2
   
   if(!matrixcalc::is.positive.definite(D.mat)) {
     D.mat <- Matrix::nearPD(D.mat)
