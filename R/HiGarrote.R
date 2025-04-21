@@ -87,12 +87,17 @@ HiGarrote <- function(D, y, quali_id = NULL, quanti_id = NULL,
   y <- as.matrix(y)
   replicate <- ncol(y)
   run <- rep(1:n, replicate)
+  y_s2 <- y
+  y <- sapply(split(y,run),mean)
+  y_sd <- sd(y)
+  y <- scale(y)
   s2 <- 0.0
   if(replicate != 1) {
-    s2 <- mean(sapply(split(y,run),var))
+    y_s2 <- y_s2/y_sd
+    s2 <- mean(sapply(split(y_s2,run),var))
+    # s2 <- s2/y_sd
   }
-  y <- sapply(split(y,run),mean)
-  y <- scale(y, scale = FALSE)
+  # y <- scale(y, scale = FALSE)
   
   # STEP 2: ERROR HANDLING
   if(n != length(y)) { stop("ERROR: Run size of D must equal to y")}
@@ -214,12 +219,13 @@ HiGarrote <- function(D, y, quali_id = NULL, quanti_id = NULL,
     beta_ele$Dmat <- as.matrix(D_nng$mat)
   }
   beta_nng <- beta_nng_cpp_R(beta_ele, replicate, n, y, A1, s2)
-  beta_shrink = round(beta_nng, 3)
+  beta_shrink = round(beta_nng, 6)
   names(beta_shrink) <- effects_name
   beta_shrink <- beta_shrink[which(beta_shrink!=0)]
   beta_shrink <- beta_shrink[order(abs(beta_shrink), decreasing  = TRUE)]
-  return(beta_shrink)
+  beta_shrink <- beta_shrink*y_sd
   
+  return(beta_shrink)
 }
 
 
@@ -279,6 +285,8 @@ HiGarrote <- function(D, y, quali_id = NULL, quanti_id = NULL,
 nnGarrote <- function(U, y, new_U = NULL, heredity = "weak") {
   # STEP 1: PREPROCESSING
   U <- as.matrix(U)
+  y_sd <- sd(y)
+  y <- y/y_sd
   n <- nrow(U)
   P <- ncol(U)
   if(n < P) {stop("ERROR: n should be much larger than P")}
@@ -300,9 +308,8 @@ nnGarrote <- function(U, y, new_U = NULL, heredity = "weak") {
   Z=U%*%B
   D.mat=t(Z)%*%Z
   d=t(Z)%*%y
-  eigval <- eigen(D.mat, symmetric = TRUE, only.values = TRUE)$values
-  is_positive_definite <- all(eigval > 0)
-  if(!is_positive_definite){
+  
+  if(!matrixcalc::is.positive.definite(D.mat)) {
     D.mat <- Matrix::nearPD(D.mat)
     D.mat <- as.matrix(D.mat$mat)
   }
@@ -320,14 +327,16 @@ nnGarrote <- function(U, y, new_U = NULL, heredity = "weak") {
   coef_nng=round(quadprog::solve.QP(D.mat, d, A1, b0)$sol,10)
   beta_nng=B%*%coef_nng
 
-  beta_shrink = round(beta_nng, 3)
+  beta_shrink = round(beta_nng, 6)
   names(beta_shrink) <- effects_name
   beta_shrink <- beta_shrink[which(beta_shrink!=0)]
   beta_shrink <- beta_shrink[order(abs(beta_shrink), decreasing  = TRUE)]
+  beta_shrink <- beta_shrink*y_sd
 
   if(is.null(new_U)) {
     return(beta_shrink)
   } else {
+    beta_nng <- beta_nng*y_sd
     new_U <- as.matrix(new_U)
     pred <- as.numeric(new_U%*%beta_nng)
     result <- list("beta_nng" = beta_shrink, "pred" = pred)
